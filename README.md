@@ -1,2 +1,1 @@
-# hadoop-cluster-utils
-Utils for setting up hadoop cluster
+# hdfs-yarn-baidu-scripts
