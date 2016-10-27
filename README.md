@@ -122,9 +122,11 @@ AN jps
 # use stop-hdfs.sh for stopping
  ```
 
-4. Verify HDFS is up and running..
+4. HDFS web address 
 
+ ```
  http://localhost:50070
+ ```
 
 ## 7. Yarn configuration
 
@@ -164,7 +166,7 @@ You need to modify 2 config files for HDFS
  Node Manager     : http://datanode:8042/node (For each node)
  ```
  
- ## 8. Useful scripts
+## 8. Useful scripts
  
  ```
   > stop-all.sh #stop HDFS and Yarn
