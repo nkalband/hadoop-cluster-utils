@@ -104,7 +104,7 @@ You need to modify the following 2 config files for HDFS
   CP hdfs-site.xml $HADOOP_HOME/etc/hadoop
    ```
 
-Format and Start HDFS 
+3. Format and Start HDFS 
 
 ```
 $HADOOP_PREFIX/bin/hdfs namenode -format mycluster
@@ -113,7 +113,7 @@ AN jps
 # use stop-hdfs.sh for stopping
 ```
 
-Verify HDFS is up and running..
+4. Verify HDFS is up and running..
 
  http://localhost:50070
 
