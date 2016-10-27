@@ -51,6 +51,12 @@ If you want some code to execute in .bashrc during remote ssh command,
 add it before "If not running interactively, don't do anything"
 
 
+##5. Hadoop setup
 
+copy hadoop.tar to all data nodes.
 
+```
+CP hadoop-2.7.1.tar.gz /home/madhu
+DN "tar xvf hadoop-2.7.1.tar.gz --gzip"
+```
 
