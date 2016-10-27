@@ -72,11 +72,12 @@ DN "tar xvf hadoop-2.7.1.tar.gz --gzip"
 
 ## 6. HDFS configuration
 
-You need to modify the following 2 config files for HDFS
+You need to modify 2 config files for HDFS
 
 1. core-site.xml #Hostname for the Name node
   ```
-  cp hadoop-cluster-utils/conf/core-site.xml.template core-site.xml
+  cd $HOME/hadoo-cluster-utils/conf
+  cp core-site.xml.template core-site.xml
   vi core-site.xml
   cp core-site.xml $HADOOP_HOME/etc/hadoop
   CP core-site.xml $HADOOP_HOME/etc/hadoop
@@ -117,3 +118,50 @@ AN jps
 
  http://localhost:50070
 
+## 7. Yarn configuration
+
+You need to modify 2 config files for HDFS
+
+1. capacity-scheduler.xml #Use DominantResourceCalculator
+
+  ```bash
+  vi $HADOOP_HOME/etc/hadoop/capacity-scheduler.xml
+  ```  
+  ```xml
+    <property>
+     <name>yarn.scheduler.capacity.resource-calculator</name>
+     <value>org.apache.hadoop.yarn.util.resource.DominantResourceCalculator</value>
+    </property>
+  ```
+2. yarn-site.xml # Modify the properties as per the description provided in the template
+  
+  ```
+  cd $HOME/hadoop-cluster-utils/conf
+  cp yarn-site.xml.template yarn-site.xml
+  vi yarn-site.xml
+  cp yarn-site.xml $HADOOP_HOME/etc/hadoop
+  CP yarn-site.xml $HADOOP_HOME/etc/hadoop
+  AN jps
+  ```
+  
+3. Start Yarn
+ ```
+ start-yarn.sh
+ AN jps
+ ```
+ 
+3. Resource Manager and Node Manager web Address
+ ```
+ Resource Manager : http://localhost:8088/cluster
+ Node Manager     : http://datanode:8042/node (For each node)
+ ```
+ 
+ ## 8. Useful scripts
+ 
+ ```
+  > stop-all.sh #stop HDFS and Yarn
+  > start-all.sh #start HDFS and Yarn
+  > CP <localpath to file> <remotepath to dir> #Copy file from name nodes to all slaves
+  > AN <command> #execute a given command in all nodes including master
+  > DN <command> #execute a given command in all nodes excluding master
+ ```
