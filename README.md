@@ -25,6 +25,7 @@ tar xvf hadoop-2.7.1.tar.gz --gzip
 
 ## 3. Update slaves file
 
+Add data nodes, don't add master node.
 ```bash
 vi $HADOOP_HOME/etc/hadoop/slaves
 user@host1
@@ -57,6 +58,13 @@ esac
   ```
   
  2. Read add-this-to-dot-profile.sh at the end of .bashrc
+
+ ```
+  vi $HOME/.bashrc
+  G
+  :r $HOME/hadoop-cluster-utils/add-this-to-dot-profile.sh
+ ```
+ 
  3. copy .bashrc to all other data nodes
   
   ``` 
