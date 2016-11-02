@@ -1,11 +1,11 @@
 
-export PATH=$HOME/hadoop-cluster-utils:$HOME/hadoo-cluster-utils/hadoop:PATH
+export PATH=$HOME/hadoop-cluster-utils/utils:$HOME/hadoop-cluster-utils/hadoop:$PATH
 
 export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-ppc64el 
 export HADOOP_HOME=$HOME/hadoop-2.7.1
 
 
-export HADOOP_PREFIX=$HADOO_HOME
+export HADOOP_PREFIX=$HADOOP_HOME
 export HADOOP_MAPRED_HOME=$HADOOP_HOME
 export HADOOP_COMMON_HOME=$HADOOP_HOME
 export HADOOP_HDFS_HOME=$HADOOP_HOME

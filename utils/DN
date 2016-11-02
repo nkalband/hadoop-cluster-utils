@@ -1,9 +1,14 @@
-echo "N003 output"
-ssh baidu@n003 $1
-echo "==========================================================="
-echo "N004 output"
-ssh baidu@n004 $1
-echo "==========================================================="
-echo "N021 output"
-ssh baidu@n021 $1
-echo "==========================================================="
+#!/bin/bash
+
+${HADOOP_HOME?"HADOOP_HOME not initialized. Check .bashrc file"} 2>/dev/null
+
+# cat ${HADOOP_HOME}/etc/hadoop/slaves | grep -v ^# | xargs -i ssh {} $1
+
+for i in `cat ${HADOOP_HOME}/etc/hadoop/slaves`
+do
+	echo "Run command $1 in $i "
+	ssh $i $1
+	echo "================================="
+done
+
+
