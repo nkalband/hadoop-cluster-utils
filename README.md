@@ -113,7 +113,7 @@ You need to modify 2 config files for HDFS
   CP hdfs-site.xml $HADOOP_HOME/etc/hadoop
    ```
 
-3. Format and Start HDFS
+3. Start HDFS as fresh FS
 
  ```
 $HADOOP_PREFIX/bin/hdfs namenode -format mycluster
@@ -122,7 +122,17 @@ AN jps
 # use stop-hdfs.sh for stopping
  ```
 
-4. HDFS web address 
+4. Start HDFS on existing cluster data
+ You need to modify ownership to self to use already created data
+
+ ```
+ AN "sudo chown user:user /data/hdfs-meta-data"
+ AN "sudo chown user:user /data/hdfs-data"
+ start-hdfs.sh
+ AN jps
+ ```
+
+5. HDFS web address 
 
  ```
  http://localhost:50070
