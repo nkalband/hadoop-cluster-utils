@@ -25,8 +25,8 @@ ssh user@host
 http://hadoop.apache.org/releases.html#Download
 
 ```
-wget http://www-us.apache.org/dist/hadoop/common/hadoop-2.7.1/hadoop-2.7.1.tar.gz
-tar xvf hadoop-2.7.1.tar.gz --gzip
+wget http://www-us.apache.org/dist/hadoop/common/hadoop-2.6.5/hadoop-2.6.5.tar.gz 
+tar xvf hadoop-2.6.5.tar.gz --gzip
 ```
 
 ## 3. Update slaves file
@@ -80,8 +80,8 @@ esac
 
 ## 5. Install Hadoop on all nodes
 ```
-CP $HOME/hadoop-2.7.1.tar.gz $HOME
-DN "tar xvf hadoop-2.7.1.tar.gz --gzip"
+CP $HOME/hadoop-2.6.5.tar.gz $HOME
+DN "tar xvf hadoop-2.6.5.tar.gz --gzip"
 ```
 
 ## 6. HDFS configuration
@@ -207,7 +207,7 @@ tar -zvf spark-2.0.1-bin-hadoop2.7.tgz
 ```
 git clone https://github.com/apache/spark.git
 export MAVEN_OPTS="-Xmx32G -XX:MaxPermSize=8G -XX:ReservedCodeCacheSize=2G"
-mvn -T40 -Pyarn -Phadoop-2.7 -Dhadoop.version=2.7.1 -Phive -Phive-thriftserver -DskipTests -Dmaven.javadoc.skip=true install
+mvn -T40 -Pyarn -Phadoop-2.6 -Dhadoop.version=2.6.5 -Phive -Phive-thriftserver -DskipTests -Dmaven.javadoc.skip=true install
 ```
 
 ### c. Test
