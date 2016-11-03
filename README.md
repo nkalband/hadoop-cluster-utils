@@ -25,7 +25,7 @@ ssh user@host
 http://hadoop.apache.org/releases.html#Download
 
 ```
-http://www-us.apache.org/dist/hadoop/common/hadoop-2.7.1/hadoop-2.7.1.tar.gz
+wget http://www-us.apache.org/dist/hadoop/common/hadoop-2.7.1/hadoop-2.7.1.tar.gz
 tar xvf hadoop-2.7.1.tar.gz --gzip
 ```
 
