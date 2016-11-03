@@ -152,7 +152,7 @@ AN jps
 
 You need to modify 2 config files for HDFS
 
-1. capacity-scheduler.xml #Use DominantResourceCalculator
+1. capacity-scheduler.xml #Modify resource-calculator property to DominantResourceCalculator
 
   ```bash
   vi $HADOOP_HOME/etc/hadoop/capacity-scheduler.xml
