@@ -26,7 +26,8 @@ http://hadoop.apache.org/releases.html#Download
 
 ```
 wget http://www-us.apache.org/dist/hadoop/common/hadoop-2.6.5/hadoop-2.6.5.tar.gz 
-tar xvf hadoop-2.6.5.tar.gz --gzip
+tar xf hadoop-2.6.5.tar.gz --gzip
+export HADOOP_HOME=$HOME/hadoop-2.6.5
 ```
 
 ## 3. Update slaves file
