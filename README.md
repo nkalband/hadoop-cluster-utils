@@ -2,6 +2,12 @@
 
 ## 1. set passwordless login
 
+To create user
+```
+sudo adduser testuser
+sudo adduser testuser sudo
+```
+
 For local host
 
 ```
@@ -19,7 +25,7 @@ ssh user@host
 http://hadoop.apache.org/releases.html#Download
 
 ```
-wget http://mirror.fibergrid.in/apache/hadoop/common/hadoop-2.7.1/hadoop-2.7.1.tar.gz
+http://www-us.apache.org/dist/hadoop/common/hadoop-2.7.1/hadoop-2.7.1.tar.gz
 tar xvf hadoop-2.7.1.tar.gz --gzip
 ```
 
