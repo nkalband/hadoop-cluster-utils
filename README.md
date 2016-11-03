@@ -68,8 +68,10 @@ esac
 
  ```
   vi $HOME/.bashrc
-  G
+  Gi
   :r $HOME/hadoop-cluster-utils/add-this-to-dot-profile.sh
+  G
+  set -o vi
  ```
  
  3. copy .bashrc to all other data nodes
@@ -82,7 +84,7 @@ esac
 ## 5. Install Hadoop on all nodes
 ```
 CP $HOME/hadoop-2.6.5.tar.gz $HOME
-DN "tar xvf hadoop-2.6.5.tar.gz --gzip"
+DN "tar xf hadoop-2.6.5.tar.gz --gzip"
 ```
 
 ## 6. HDFS configuration
