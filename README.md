@@ -91,9 +91,9 @@ DN "tar xf hadoop-2.6.5.tar.gz --gzip"
 
 You need to modify 2 config files for HDFS
 
-1. core-site.xml #Hostname for the Name node
+1. core-site.xml #Modify the Hostname for the Name node
   ```
-  cd $HOME/hadoo-cluster-utils/conf
+  cd $HOME/hadoop-cluster-utils/conf
   cp core-site.xml.template core-site.xml
   vi core-site.xml
   cp core-site.xml $HADOOP_HOME/etc/hadoop
@@ -102,7 +102,7 @@ You need to modify 2 config files for HDFS
   
 2. hdfs-site.xml 
 
-  create local dir in name node for meta-data
+  create local dir in name node for meta-data (
   
   ``` mkdir -p /data/user/hdfs-meta-data ```
   
@@ -112,7 +112,8 @@ You need to modify 2 config files for HDFS
 
   update dir path
   ```
-  cp hadoop-cluster-utils/conf/hdfs-site.xml.template hdfs-site.xml
+  cd $HOME/hadoop-cluster-utils/conf
+  cp hdfs-site.xml.template hdfs-site.xml
   vi hdfs-site.xml #update dir path
   ```
   Copy the files to all nodes
