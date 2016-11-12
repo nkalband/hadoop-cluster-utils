@@ -26,9 +26,9 @@ http://hadoop.apache.org/releases.html#Download
 
 ```
 #Choose the right mirror, below link is for US machines.
-wget http://www-us.apache.org/dist/hadoop/common/hadoop-2.6.5/hadoop-2.6.5.tar.gz 
-tar xf hadoop-2.6.5.tar.gz --gzip
-export HADOOP_HOME=$HOME/hadoop-2.6.5
+wget http://www-us.apache.org/dist/hadoop/common/hadoop-2.7.3/hadoop-2.7.3.tar.gz
+tar xf hadoop-2.7.3.tar.gz --gzip
+export HADOOP_HOME=$HOME/hadoop-2.7.3
 ```
 
 ## 3. Update slaves file
@@ -84,8 +84,8 @@ esac
 
 ## 5. Install Hadoop on all nodes
 ```
-CP $HOME/hadoop-2.6.5.tar.gz $HOME
-DN "tar xf hadoop-2.6.5.tar.gz --gzip"
+CP $HOME/hadoop-2.7.3.tar.gz $HOME
+DN "tar xf hadoop-2.7.3.tar.gz --gzip"
 ```
 
 ## 6. HDFS configuration
@@ -204,25 +204,41 @@ You need to modify 2 config files for HDFS
 ```
 http://spark.apache.org/downloads.html
 #Choose the right mirror, below link is for US machines.
-wget http://www-us.apache.org/dist/spark/spark-1.6.2/spark-1.6.2-bin-hadoop2.6.tgz 
-tar -zvf spark-1.6.2-bin-hadoop2.6.tgz
+wget http://www-us.apache.org/dist/spark/spark-2.0.1/spark-2.0.1-bin-hadoop2.7.tgz
+tar -zvf spark-2.0.1-bin-hadoop2.7.tgz
 ```
 
 ### b. Build it yourself
 
 ```
 git clone https://github.com/apache/spark.git
-git checkout 
+git checkout -b v2.0.1 v2.0.1
 export MAVEN_OPTS="-Xmx32G -XX:MaxPermSize=8G -XX:ReservedCodeCacheSize=2G"
-mvn -T40 -Pyarn -Phadoop-2.6 -Dhadoop.version=2.6.5 -Phive -Phive-thriftserver -DskipTests -Dmaven.javadoc.skip=true install
+./build/mvn -T40 -Pyarn -Phadoop-2.7 -Dhadoop.version=2.7.3 -Phive -Phive-thriftserver -DskipTests -Dmaven.javadoc.skip=true install
 ```
 
-### c. Test
+### c. Test (pre-built spark version)
 ```
-export SPARK_HOME=$HOME/spark-1.6.2-bin-hadoop2.6 #in .bashrc
+#Add in ~/.bashrc
+export SPARK_HOME=$HOME/spark-2.0.1-bin-hadoop2.7 
 
-./bin/spark-submit --class org.apache.spark.examples.SparkPi     --master yarn-client --driver-memory 1024M --num-executors 2    --executor-memory 1g     --executor-cores 1     ./lib/spark-examples-1.6.2-hadoop2.6.0.jar    10 
+. ~/.bashrc
+
+${SPARK_HOME}/bin/spark-submit --class org.apache.spark.examples.SparkPi   --master yarn-client --driver-memory 1024M --num-executors 2  --executor-memory 1g  --executor-cores 1   ${SPARK_HOME}/lib/spark-examples-2.0.1-bin-hadoop2.7.jar    10 
 ```
+
+### d. Test (manual spark build)
+
+```
+#Add in ~/.bashrc
+export SPARK_HOME=$HOME/spark
+
+. ~/.bashrc
+
+$SPARK_HOME/bin/spark-submit --class org.apache.spark.examples.SparkPi     --master yarn-client --driver-memory 1024M --num-executors 2    --executor-memory 1g     --executor-cores 1  /home/testuser/spark/examples/target/scala-2.11/jars/spark-examples_2.11-2.0.1.jar
+
+```
+
 
 ## 10. Spark command line options for Yarn Scheduler.
 
