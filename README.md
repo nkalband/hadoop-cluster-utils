@@ -217,25 +217,7 @@ export MAVEN_OPTS="-Xmx32G -XX:MaxPermSize=8G -XX:ReservedCodeCacheSize=2G"
 ./build/mvn -T40 -Pyarn -Phadoop-2.7 -Dhadoop.version=2.7.3 -Phive -Phive-thriftserver -DskipTests -Dmaven.javadoc.skip=true install
 ```
 
-### c. Enable EventLogging & additional settings by adding the following content to $SPARK_HOME/conf/spark-defaults.conf
-```
-spark.eventLog.enabled   true
-spark.eventLog.dir       /tmp/spark-events
-spark.eventLog.compress  true
-spark.history.fs.logDirectory   /tmp/spark-events
-spark.serializer                 org.apache.spark.serializer.KryoSerializer
-```
-
-### d. Start history server.
-
-```
- mkdir -p /tmp/spark-events
- $SPARK_HOME/sbin/start-history-server.sh
- 
- # To stop run: $SPARK_HOME/sbin/stop-history-server.sh
-```
-
-### e. Test (pre-built spark version)
+### c. Test (pre-built spark version)
 ```
 #Add in ~/.bashrc
 export SPARK_HOME=$HOME/spark-2.0.1-bin-hadoop2.7 
@@ -245,7 +227,7 @@ export SPARK_HOME=$HOME/spark-2.0.1-bin-hadoop2.7
 ${SPARK_HOME}/bin/spark-submit --class org.apache.spark.examples.SparkPi   --master yarn-client --driver-memory 1024M --num-executors 2  --executor-memory 1g  --executor-cores 1   ${SPARK_HOME}/lib/spark-examples-2.0.1-bin-hadoop2.7.jar    10 
 ```
 
-### f. Test (manual spark build)
+### d. Test (manual spark build)
 
 ```
 #Add in ~/.bashrc
@@ -255,6 +237,36 @@ export SPARK_HOME=$HOME/spark
 
 $SPARK_HOME/bin/spark-submit --class org.apache.spark.examples.SparkPi     --master yarn-client --driver-memory 1024M --num-executors 2    --executor-memory 1g     --executor-cores 1  /home/testuser/spark/examples/target/scala-2.11/jars/spark-examples_2.11-2.0.1.jar
 
+```
+
+### e. Enable EventLogging & additional settings by adding the following content to $SPARK_HOME/conf/spark-defaults.conf
+```
+spark.eventLog.enabled   true
+spark.eventLog.dir       /tmp/spark-events
+spark.eventLog.compress  true
+spark.history.fs.logDirectory   /tmp/spark-events
+spark.serializer                 org.apache.spark.serializer.KryoSerializer
+```
+
+### f. Start/Stop All Services.
+
+ The below scripts are used to start/stop the following services in an automated way,
+ 
+  - namenode daemon (only on hdfs master)
+  - datanode daemon (on all slave nodes)
+  - resource manager daemon (only on yarn master)
+  - node manager daemon (on all slave nodes)
+  - job history server (only on yarn master)
+  - Spark history server (on yarn master)
+
+```
+ # Start 
+ 
+ start-all.sh
+ 
+ # Stop
+ 
+ stop-all.sh
 ```
 
 
