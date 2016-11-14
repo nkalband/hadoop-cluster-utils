@@ -267,8 +267,8 @@ spark.serializer                 org.apache.spark.serializer.KryoSerializer
  # Stop
  
  stop-all.sh
+=======
 ```
-
 
 ## 10. Spark command line options for Yarn Scheduler.
 
