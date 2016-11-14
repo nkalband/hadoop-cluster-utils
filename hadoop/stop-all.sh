@@ -5,3 +5,4 @@ $HADOOP_HOME/sbin/yarn-daemon.sh stop resourcemanager
 $HADOOP_HOME/sbin/hadoop-daemons.sh stop datanode
 $HADOOP_HOME/sbin/hadoop-daemon.sh stop namenode
 
+$SPARK_HOME/sbin/stop-history-server.sh

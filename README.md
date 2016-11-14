@@ -239,6 +239,36 @@ $SPARK_HOME/bin/spark-submit --class org.apache.spark.examples.SparkPi     --mas
 
 ```
 
+### e. Enable EventLogging & additional settings by adding the following content to $SPARK_HOME/conf/spark-defaults.conf
+```
+spark.eventLog.enabled   true
+spark.eventLog.dir       /tmp/spark-events
+spark.eventLog.compress  true
+spark.history.fs.logDirectory   /tmp/spark-events
+spark.serializer                 org.apache.spark.serializer.KryoSerializer
+```
+
+### f. Start/Stop All Services.
+
+ The below scripts are used to start/stop the following services in an automated way,
+ 
+  - namenode daemon (only on hdfs master)
+  - datanode daemon (on all slave nodes)
+  - resource manager daemon (only on yarn master)
+  - node manager daemon (on all slave nodes)
+  - job history server (only on yarn master)
+  - Spark history server (on yarn master)
+
+```
+ # Start 
+ 
+ start-all.sh
+ 
+ # Stop
+ 
+ stop-all.sh
+=======
+```
 
 ## 10. Spark command line options for Yarn Scheduler.
 
