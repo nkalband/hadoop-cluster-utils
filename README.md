@@ -226,8 +226,16 @@ spark.history.fs.logDirectory   /tmp/spark-events
 spark.serializer                 org.apache.spark.serializer.KryoSerializer
 ```
 
+### d. Start history server.
 
-### c. Test (pre-built spark version)
+```
+ mkdir -p /tmp/spark-events
+ $SPARK_HOME/sbin/start-history-server.sh
+ 
+ # To stop run: $SPARK_HOME/sbin/stop-history-server.sh
+```
+
+### e. Test (pre-built spark version)
 ```
 #Add in ~/.bashrc
 export SPARK_HOME=$HOME/spark-2.0.1-bin-hadoop2.7 
@@ -237,7 +245,7 @@ export SPARK_HOME=$HOME/spark-2.0.1-bin-hadoop2.7
 ${SPARK_HOME}/bin/spark-submit --class org.apache.spark.examples.SparkPi   --master yarn-client --driver-memory 1024M --num-executors 2  --executor-memory 1g  --executor-cores 1   ${SPARK_HOME}/lib/spark-examples-2.0.1-bin-hadoop2.7.jar    10 
 ```
 
-### d. Test (manual spark build)
+### f. Test (manual spark build)
 
 ```
 #Add in ~/.bashrc
