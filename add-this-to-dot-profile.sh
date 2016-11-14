@@ -2,7 +2,7 @@
 export PATH=$HOME/hadoop-cluster-utils/utils:$HOME/hadoop-cluster-utils/hadoop:$PATH
 
 export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-ppc64el 
-export HADOOP_HOME=$HOME/hadoop-2.6.5
+export HADOOP_HOME=$HOME/hadoop-2.7.3
 
 
 export HADOOP_PREFIX=$HADOOP_HOME
@@ -13,6 +13,8 @@ export YARN_HOME=$HADOOP_HOME
 export HADOOP_CONF_DIR=$HADOOP_HOME/etc/hadoop
 export YARN_CONF_DIR=$HADOOP_HOME/etc/hadoop
 
+export PATH=${HADOOP_HOME}/bin:$PATH
+set -o vi
 
 # Some convenient aliases and functions for running Hadoop-related commands
 unalias fs &> /dev/null

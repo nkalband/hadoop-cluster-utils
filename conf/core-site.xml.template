@@ -22,4 +22,8 @@
     <value>hdfs://namenode</value>
     <description>Name node URL </description>
   </property>
+    <property>
+    <name>hadoop.tmp.dir</name>
+    <value>file:/spark1/data/baidu/tmp</value>
+  </property>
 </configuration>
