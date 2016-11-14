@@ -5,3 +5,4 @@ $HADOOP_HOME/sbin/yarn-daemon.sh start resourcemanager
 $HADOOP_HOME/sbin/yarn-daemons.sh start nodemanager
 $HADOOP_HOME/sbin/mr-jobhistory-daemon.sh start historyserver
 
+$SPARK_HOME/sbin/start-history-server.sh
