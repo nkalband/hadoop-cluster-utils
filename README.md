@@ -217,6 +217,16 @@ export MAVEN_OPTS="-Xmx32G -XX:MaxPermSize=8G -XX:ReservedCodeCacheSize=2G"
 ./build/mvn -T40 -Pyarn -Phadoop-2.7 -Dhadoop.version=2.7.3 -Phive -Phive-thriftserver -DskipTests -Dmaven.javadoc.skip=true install
 ```
 
+### c. Enable EventLogging & additional settings by adding the following content to $SPARK_HOME/conf/spark-defaults.conf
+```
+spark.eventLog.enabled   true
+spark.eventLog.dir       /tmp/spark-events
+spark.eventLog.compress  true
+spark.history.fs.logDirectory   /tmp/spark-events
+spark.serializer                 org.apache.spark.serializer.KryoSerializer
+```
+
+
 ### c. Test (pre-built spark version)
 ```
 #Add in ~/.bashrc
