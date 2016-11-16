@@ -142,6 +142,16 @@ AN jps
  start-hdfs.sh
  AN jps
  ```
+ 
+  Ensure that the following java process is running in master. If not, check the log files
+  
+  ```
+  NameNode
+  ```
+  Ensure that the following java process is running in slaves. If not, check the log files
+  ```
+  DataNode
+  ```
 
 5. HDFS web address 
 
@@ -173,6 +183,17 @@ You need to modify 2 config files for HDFS
   cp yarn-site.xml $HADOOP_HOME/etc/hadoop
   CP yarn-site.xml $HADOOP_HOME/etc/hadoop
   AN jps
+  ```
+  
+    Ensure that the following java process is started in master. If not, check the log files
+  
+  ```
+  JobHistoryServer
+  ResourceManager
+  ```
+  Ensure that the following java process is started in slaves. If not, check the log files
+  ```
+  NodeManager
   ```
   
 3. Start Yarn
@@ -224,7 +245,7 @@ export SPARK_HOME=$HOME/spark-2.0.1-bin-hadoop2.7
 
 . ~/.bashrc
 
-${SPARK_HOME}/bin/spark-submit --class org.apache.spark.examples.SparkPi   --master yarn-client --driver-memory 1024M --num-executors 2  --executor-memory 1g  --executor-cores 1   ${SPARK_HOME}/lib/spark-examples-2.0.1-bin-hadoop2.7.jar    10 
+${SPARK_HOME}bin/spark-submit --class org.apache.spark.examples.SparkPi --master yarn-client --driver-memory 1024M --num-executors 2 --executor-memory 1g  --executor-cores 1 ${SPARK_HOME}/examples/jars/spark-examples_2.11-2.0.1.jar 10             
 ```
 
 ### d. Test (manual spark build)
