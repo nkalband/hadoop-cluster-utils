@@ -16,55 +16,98 @@
 <!-- Site specific YARN configuration properties -->
 
 <!-- Resource Manager properties -->
-    <property>
-	<name>yarn.resourcemanager.hostname</name>
-	<value>n001</value>
-    </property>
-    <property>
-        <name>yarn.resourcemanager.webapp.address</name>
-        <value>0.0.0.0:8088</value>
-    </property>
+	<property>
+		<name>yarn.resourcemanager.hostname</name>
+		<value>MASTER</value>
+	</property>
+
+	<property>
+		<name>yarn.resourcemanager.scheduler.address</name>
+		<value>0.0.0.0:RESOURCEMANAGER_SCHEDULER_ADDRESS</value>
+		<description>The address of the scheduler interface.</description>
+	</property>
+	
+	<property>
+		<name>yarn.resourcemanager.resource-tracker.address</name>
+		<value>0.0.0.0:RESOURCEMANAGER_RESOURCE_TRACKER_ADDRESS</value>
+	</property>
+	
+	<property>
+		<name>yarn.resourcemanager.address</name>
+		<value>0.0.0.0:RESOURCEMANAGER_ADDRESS</value>
+		<description>The address of the RM web application.</description>
+	</property>
+	
+	<property>
+		<name>yarn.resourcemanager.admin.address</name>
+		<value>0.0.0.0:RESOURCEMANAGER_ADMIN_ADDRESS</value>
+		<description>The address of the RM admin interface.</description>
+	</property>
+	
+	<property>
+		<name>yarn.resourcemanager.webapp.address</name>
+		<value>0.0.0.0:RESOURCEMANAGER_WEBAPP_ADDRESS</value>
+		<description>The address of the applications manager interface in the RM.</description>
+	</property>
 
 <!-- Scheduler properties -->
-    <property>
-        <name>yarn.scheduler.minimum-allocation-mb</name>
-        <value>128</value>
-        <description>Min value for --executor-memory</description>
-    </property>
-    <property>
-        <name>yarn.scheduler.maximum-allocation-mb</name>
-        <value>204800</value>
-        <description>Max value for --executor-memory</description>
-    </property>
-    <property>
-        <name>yarn.scheduler.minimum-allocation-vcores</name>
-        <value>1</value>
-        <description>Min value for —executor-vcore</description>
-    </property>
-    <property>
-        <name>yarn.scheduler.maximum-allocation-vcores</name>
-        <value>40</value>
-        <description>Max value for —executor-vcore</description>
-    </property>
+	<property>
+		<name>yarn.scheduler.minimum-allocation-mb</name>
+		<value>YARN_SCHEDULER_MIN_ALLOCATION_MB</value>
+		<description>Min value for --executor-memory</description>
+	</property>
+	
+	<property>
+		<name>yarn.scheduler.maximum-allocation-mb</name>
+		<value>YARN_SCHEDULER_MAX_ALLOCATION_MB</value>
+		<description>Max value for --executor-memory</description>
+	</property>
+
+	<property>
+		<name>yarn.scheduler.minimum-allocation-vcores</name>
+		<value>YARN_SCHEDULER_MIN_ALLOCATION_VCORES</value>
+		<description>Min value for —executor-vcore</description>
+	</property>
+
+	<property>
+		<name>yarn.scheduler.maximum-allocation-vcores</name>
+		<value>YARN_SCHEDULER_MAX_ALLOCATION_VCORES</value>
+		<description>Max value for —executor-vcore</description>
+	</property>
 
 <!-- Node Manager properties -->
-    <property>
-        <name>yarn.nodemanager.resource.cpu-vcores</name>
-        <value>160</value>
-        <description>Vcore capacity of this node</description>
-    </property>
-    <property>
-        <name>yarn.nodemanager.resource.memory-mb</name>
-        <value>204800</value>
-        <description>Memory Capacity of this node</description>
-    </property>
-    <property>
-        <name>yarn.nodemanager.vmem-check-enabled</name>
-        <value>false</value>
-    </property>
-    <property>
-        <name>yarn.nodemanager.pmem-check-enabled</name>
-	<value>false</value>
-    </property>
+	<property>
+		<name>yarn.nodemanager.resource.cpu-vcores</name>
+		<value>YARN_NODEMANAGER_RESOURCE_CPU_VCORES</value>
+		<description>Vcore capacity of this node</description>
+	</property>
+
+	<property>
+		<name>yarn.nodemanager.resource.memory-mb</name>
+		<value>YARN_NODEMANAGER_RESOURCE_MEMORY_MB</value>
+		<description>Memory Capacity of this node</description>
+	</property>
+
+	<property>
+		<name>yarn.nodemanager.vmem-check-enabled</name>
+		<value>false</value>
+	</property>
+
+	<property>
+		<name>yarn.nodemanager.pmem-check-enabled</name>
+		<value>false</value>
+	</property>
+	
+	<property>
+		<name>yarn.nodemanager.localizer.address</name>
+		<value>	0.0.0.0:NODEMANAGER_LOCALIZER_ADDRESS</value>
+		<description>Address where the localizer IPC is.</description>
+	</property>
+
+	<property>
+		<name>yarn.nodemanager.webapp.address</name>
+		<value>0.0.0.0:NODEMANAGER_WEBAPP_ADDRESS</value>
+		<description>NM Webapp address.</description>
+	</property>
 
 </configuration>

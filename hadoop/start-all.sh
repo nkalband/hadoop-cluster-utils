@@ -6,3 +6,6 @@ $HADOOP_HOME/sbin/yarn-daemons.sh start nodemanager
 $HADOOP_HOME/sbin/mr-jobhistory-daemon.sh start historyserver
 
 $SPARK_HOME/sbin/start-history-server.sh
+
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )" 
+${DIR}/../utils/checkall.sh 

@@ -18,21 +18,59 @@
 
 <configuration>
 
-<property>
-<name>dfs.replication</name>
-<value>3</value>
-</property>
+	<property>
+		<name>dfs.replication</name>
+		<value>REPLICATION_VALUE</value>
+	</property>
 
-<property>
-<name>dfs.namenode.name.dir</name>
-<value>file:/data/madhu/hdfs-meta-data</value>
-<description>Meta data dir - can be RAM FS only on Namename</description>
-</property>
+<!-- Namename properties -->
+	<property>
+		<name>dfs.namenode.name.dir</name>
+		<value>NAMENODE_DIR</value>
+		<description>Meta data dir - can be RAM FS only on Namename</description>
+	</property>
+	
+	<property>
+		<name>dfs.namenode.http-address</name>
+		<value>	0.0.0.0:NAMENODE_HTTP_ADDRESS</value>
+		<description>The address and the base port where the dfs namenode web ui will listen on.</description>
+	</property>
+	
+	<property>
+		<name>dfs.namenode.secondary.http-address</name>
+		<value>0.0.0.0:NAMENODE_SECONDARY_HTTP_ADDRESS</value>
+		<description>The secondary namenode http server address and port.</description>
+	</property>
 
-<property>
-<name>dfs.datanode.data.dir</name>
-<value>file:/data/madhu/hdfs-data</value>
-<description>Data dir - on all data nodes</description>
-</property>
+	<property>
+		<name>dfs.namenode.secondary.https-address</name>
+		<value>0.0.0.0:NAMENODE_SECONDARY_HTTPS_ADDRESS</value>
+		<description>The secondary namenode HTTPS server address and port.</description>
+	</property>
+
+<!-- Datanode properties -->
+	<property>
+		<name>dfs.datanode.data.dir</name>
+		<value>DATANODE_DIR</value>
+		<description>Data dir - on all data nodes</description>
+	</property>
+	
+	<property>
+		<name>dfs.datanode.address</name>
+		<value>0.0.0.0:DATANODE_ADDRESS</value>
+		<description>The datanode server address and port for data transfer.</description>
+	</property>
+
+	<property>
+		<name>dfs.datanode.http.address</name>
+		<value>0.0.0.0:DATANODE_HTTP_ADDRESS</value>
+		<description>The datanode http server address and port.</description>
+	</property>
+
+	<property>
+		<name>dfs.datanode.ipc.address</name>
+		<value>0.0.0.0:DATANODE_IPC_ADDRESS</value>
+		<description>The datanode ipc server address and port.</description>
+	</property>
 
 </configuration>
