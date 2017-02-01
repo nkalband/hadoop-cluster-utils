@@ -19,7 +19,8 @@ fi
 
 log=`pwd`/logs/hadoop_cluster_utils_$current_time.log
 echo -e | tee -a $log
-if [[ -n "$JAVA_HOME" ]]
+grep '^export JAVA_HOME' $HOME/.bashrc &>>/dev/null
+if [[ $? -eq 0 ]]
 then
     echo JAVA_HOME found on MASTER, java executable in $JAVA_HOME | tee $log
     echo "---------------------------------------------" | tee -a $log
@@ -62,21 +63,21 @@ fi
 
 ## Validation for config file
 
-if [ -f ${CURDIR}/config.sh ]; 
+if [ -f ${CURDIR}/config ]; 
 then
-    ## First time permission set for config.sh file
-    chmod +x config.sh
-    source config.sh
+    ## First time permission set for config file
+    chmod +x ${CURDIR}/config
+    source ${CURDIR}/config
  
     ## Checking config file for all required fields
   
-    { cat ${CURDIR}/config.sh; echo; } | while read -r line; do
+    { cat ${CURDIR}/config; echo; } | while read -r line; do
       if [[ $line =~ "=" ]] ;
       then
           confvalue=`echo $line |grep = | cut -d "=" -f2`
           if [[ -z "$confvalue" ]];
           then
-              echo "Configuration vlaue not set properly for $line, please check config.sh file" | tee -a $log
+              echo "Configuration vlaue not set properly for $line, please check config file" | tee -a $log
               exit 1
           fi
       fi
@@ -103,19 +104,19 @@ then
     then
         cat temp
         cat temp >> $log
-        echo "Kindly kill above running instance(s) else change port number in config.sh file, then continue to run this script." | tee -a $log
+        echo "Kindly kill above running instance(s) else change port number in config file, then continue to run this script." | tee -a $log
         rm temp &>/dev/null 
         exit 1
     fi
    
     ## Adding slave machine names to slave file
-    cat ${CURDIR}/config.sh | grep SLAVES | grep -v "^#" |cut -d "=" -f2 | tr "%" "\n" | cut -d "," -f1  >${CURDIR}/conf/slaves 
+    cat ${CURDIR}/config | grep SLAVES | grep -v "^#" |cut -d "=" -f2 | tr "%" "\n" | cut -d "," -f1  >${CURDIR}/conf/slaves 
 
 
     
-    SLAVES=`cat ${CURDIR}/config.sh | grep SLAVES | grep -v "^#" |cut -d "=" -f2`
+    SLAVES=`cat ${CURDIR}/config | grep SLAVES | grep -v "^#" |cut -d "=" -f2`
     
-    cat ${CURDIR}/config.sh | grep SLAVES | grep -v "^#" | tr "%" "\n" | grep "$MASTER" &>>/dev/null
+    cat ${CURDIR}/config | grep SLAVES | grep -v "^#" | tr "%" "\n" | grep "$MASTER" &>>/dev/null
     if [ $? -eq 0 ]
     then
 	    #if master is also used as data machine 
@@ -138,7 +139,7 @@ then
              echo "$ip is Pingable" | tee -a $log
          else
              echo "$ip Not Pingable" | tee -a $log
-             echo 'Please check your config.sh file. '$ip' is not pingalbe. \n' | tee -a $log
+             echo 'Please check your config file. '$ip' is not pingalbe. \n' | tee -a $log
          exit 1
          fi
     done <${CURDIR}/conf/slaves
@@ -161,23 +162,31 @@ then
             exit 1
         fi 
     fi	
-
-	  
+	
     ## Copying hadoop tgz file , unzipping and exporting paths in the .bashrc file on all machines
 		  	  
 	for i in `echo $SERVERS |cut -d "=" -f2 | tr "%" "\n" | cut -d "," -f1`
 	do 
 	  
-	    if [ $i != $MASTER ]
+        if [ $i != $MASTER ]
 	    then
 	      echo 'Copying Hadoop setup file on '$i'' | tee -a $log
 	      scp ${WORKDIR}/hadoop-${hadoopver}.tar.gz @$i:${WORKDIR} | tee -a $log
 	    fi
+		ssh $i '[ -d '${WORKDIR}/hadoop-${hadoopver}' ]' &>>/dev/null
+		if [ $? -eq 0 ]
+		then 
+		echo 'Deleting already existing hadoop folder-'hadoop-${hadoopver}' from '$i' '| tee -a $log
+		ssh $i "rm -rf ${WORKDIR}/hadoop-${hadoopver}" &>>/dev/null
+		fi
+		
         echo 'Unzipping Hadoop setup file on '$i'' | tee -a $log	  
 	    ssh $i "tar xf hadoop-${hadoopver}.tar.gz --gzip" 
 	 
-         echo 'Updating hadoop variables on '$i'' | tee -a $log
+        echo 'Updating hadoop variables on '$i'' | tee -a $log
 		 
+	     export HADOOP_HOME="${WORKDIR}"/hadoop-${hadoopver}
+
 	     export HADOOP_HOME="${WORKDIR}"/hadoop-${hadoopver}
 	     echo "#StartHadoopEnv"> tmp_b
          echo "export CURDIR="${CURDIR}"" >> tmp_b
@@ -304,7 +313,7 @@ fi
 
 ##Spark installation
 
-echo "${ul}Downloading and installing Spark...${nul}" | tee -a $log
+echo -e "${ul}Downloading and installing Spark...${nul}\n" | tee -a $log
 
 cd ${WORKDIR}
 
@@ -325,13 +334,22 @@ fi
 
 for i in `echo $SERVERS |cut -d "=" -f2 | tr "%" "\n" | cut -d "," -f1`
 do
+
     if [ $i != $MASTER ]
 	then
 	    echo 'Copying Spark setup file on '$i'' | tee -a $log
 	    scp ${WORKDIR}/spark-${sparkver}-bin-hadoop${hadoopver:0:3}.tgz @$i:${WORKDIR} | tee -a $log
 	fi
+	
+	ssh $i '[ -d '${WORKDIR}/spark-${sparkver}-bin-hadoop${hadoopver:0:3}' ]' &>>/dev/null
+	if [ $? -eq 0 ]
+		then 
+		echo 'Deleting already existing spark folder-'spark-${sparkver}-bin-hadoop${hadoopver:0:3}'  from '$i' '| tee -a $log
+		ssh $i "rm -rf ${WORKDIR}/spark-${sparkver}-bin-hadoop${hadoopver:0:3}" &>>/dev/null
+	fi
+	
 	echo 'Unzipping Spark setup file on '$i'' | tee -a $log
-    ssh $i "tar xf spark*.tgz --gzip" | tee -a $log	
+    ssh $i "tar xf spark-${sparkver}-bin-hadoop${hadoopver:0:3}.tgz --gzip" | tee -a $log	
 	
 	echo 'Updating .bashrc file on '$i' with Spark variables '	
 	echo '#StartSparkEnv' >tmp_b
@@ -353,10 +371,10 @@ do
 	fi
 
 	ssh $i "source $HOME/.bashrc"
-		
+    echo "---------------------------------------------" | tee -a $log			
 done
 rm -rf tmp_b
-echo "---------------------------------------------" | tee -a $log	
+
 
 ## updating Slave file for Spark folder
 source ${HOME}/.bashrc
@@ -374,23 +392,29 @@ if [ $? -ne 0 ];
 then
     echo "#StartSparkconf" >> $SPARK_HOME/conf/spark-defaults.conf
     echo "spark.eventLog.enabled   true" >> $SPARK_HOME/conf/spark-defaults.conf
-    echo "spark.eventLog.dir       /tmp/${USER}/spark-events" >> $SPARK_HOME/conf/spark-defaults.conf 
+    echo 'spark.eventLog.dir       '${HOME}'/hadoop_tmp/spark-events' >> $SPARK_HOME/conf/spark-defaults.conf 
     echo "spark.eventLog.compress  true" >> $SPARK_HOME/conf/spark-defaults.conf
-    echo "spark.history.fs.logDirectory   /tmp/${USER}/spark-events-history" >> $SPARK_HOME/conf/spark-defaults.conf
+    echo 'spark.history.fs.logDirectory   '${HOME}'/hadoop_tmp/spark-events-history' >> $SPARK_HOME/conf/spark-defaults.conf
     echo "#StopSparkconf">> $SPARK_HOME/conf/spark-defaults.conf
 else
     sed -i '/#StartSparkconf/,/#StopSparkconf/ d' $SPARK_HOME/conf/spark-defaults.conf
     echo "#StartSparkconf" >> $SPARK_HOME/conf/spark-defaults.conf 
     echo "spark.eventLog.enabled   true" >> $SPARK_HOME/conf/spark-defaults.conf
-    echo "spark.eventLog.dir       /tmp/${USER}/spark-events" >> $SPARK_HOME/conf/spark-defaults.conf
+    echo 'spark.eventLog.dir       '${HOME}'/hadoop_tmp/spark-events' >> $SPARK_HOME/conf/spark-defaults.conf
     echo "spark.eventLog.compress  true" >> $SPARK_HOME/conf/spark-defaults.conf
-    echo "spark.history.fs.logDirectory   /tmp/${USER}/spark-events-history" >> $SPARK_HOME/conf/spark-defaults.conf
+    echo 'spark.history.fs.logDirectory   '${HOME}'/hadoop_tmp/spark-events-history' >> $SPARK_HOME/conf/spark-defaults.conf
     echo "#StopSparkconf">> $SPARK_HOME/conf/spark-defaults.conf
 fi
 
 CP $SPARK_HOME/conf/spark-defaults.conf $SPARK_HOME/conf &>/dev/null
 
 echo -e "Spark installation done..!!\n" | tee -a $log
+
+#setting spark log properties to display only errors
+cp $SPARK_HOME/conf/log4j.properties.template $SPARK_HOME/conf/log4j.properties
+sed -i 's/^log4j.rootCategory.*/log4j.rootCategory=ERROR, console/g' $SPARK_HOME/conf/log4j.properties
+CP $SPARK_HOME/conf/log4j.properties $SPARK_HOME/conf &>/dev/null
+
 
 ##to start hadoop setup
 
@@ -400,18 +424,16 @@ then
      AN "mkdir -p $HADOOP_TMP_DIR" &>/dev/null
      AN "mkdir -p $NAMENODE_DIR" &>/dev/null
      AN "mkdir -p $DATANODE_DIR" &>/dev/null
-     AN "mkdir -p /tmp/${USER}/spark-events" &>/dev/null
-     AN "mkdir -p /tmp/${USER}/spark-events-history" &>/dev/null
+     AN "mkdir -p '${HOME}'/hadoop_tmp/spark-events" &>/dev/null
+     AN "mkdir -p '${HOME}'/hadoop_tmp/spark-events-history" &>/dev/null
      echo "Finished creating directories"
 else 
-     AN "rm -rf /tmp/${USER}/*" &>/dev/null
-	 AN "rm -rf /tmp/${USER}/spark-events" &>/dev/null
-	 AN "rm -rf /tmp/${USER}/spark-events-history" &>/dev/null
+     AN "rm -rf '${HOME}'/hadoop_tmp/*" &>/dev/null
 	 AN "mkdir -p $HADOOP_TMP_DIR" &>/dev/null
      AN "mkdir -p $NAMENODE_DIR" &>/dev/null
      AN "mkdir -p $DATANODE_DIR" &>/dev/null
-     AN "mkdir -p /tmp/${USER}/spark-events" &>/dev/null
-     AN "mkdir -p /tmp/${USER}/spark-events-history" &>/dev/null
+     AN "mkdir -p '${HOME}'/hadoop_tmp/spark-events" &>/dev/null
+     AN "mkdir -p '${HOME}'/hadoop_tmp/spark-events-history" &>/dev/null
      echo "Finished creating directories"
 fi        
 
@@ -453,10 +475,10 @@ echo "---------------------------------------------" | tee -a $log
 grep -r 'Pi is roughly' ${log}
 if [ $? -eq 0 ];
 then
-   echo 'Spark services running.' | tee -a $log
+   echo -e 'Spark services running.\n' | tee -a $log
    echo 'Please check log file '$log' for more details.'
 else
-   echo 'Expected output not found.' | tee -a $log
+   echo -e 'Expected output not found.\n' | tee -a $log
    echo 'Please check log file '$log' for more details'
 fi
-echo -e
+echo 'Please execute "source ~/.bashrc" to export updated hadoop and spark environment variables in your current login session'
