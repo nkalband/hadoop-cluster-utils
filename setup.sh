@@ -76,7 +76,7 @@ then
         SERVERS=`echo ''$MASTER_DETAILS'%'$SLAVES''`
     fi
 	
-	#Check for JAVA_HOME in bashrc of all nodes
+	#Check for JAVA_HOME in bashrc of all machines
 	for i in `echo $SERVERS |cut -d "=" -f2 | tr "%" "\n" | cut -d "," -f1`
 	do
 		JAVA=$(ssh $i "grep '^export JAVA_HOME' $HOME/.bashrc | cut -f2 -d "="") 2>/dev/null
@@ -91,7 +91,7 @@ then
     
     echo "---------------------------------------------" | tee -a $log	
     
-	#Checking for prerequisite on master
+	#Checking for other prerequisite
 	
 	for i in `echo $SERVERS |cut -d "=" -f2 | tr "%" "\n" | cut -d "," -f1`
 	do
@@ -190,17 +190,15 @@ then
 		ssh $i '[ -d '${WORKDIR}/hadoop-${hadoopver}' ]' &>>/dev/null
 		if [ $? -eq 0 ]
 		then 
-		echo 'Deleting existing hadoop folder "'hadoop-${hadoopver}'" from '$i' '| tee -a $log
-		ssh $i "rm -rf ${WORKDIR}/hadoop-${hadoopver}" &>>/dev/null
+		 echo 'Deleting existing hadoop folder "'hadoop-${hadoopver}'" from '$i' '| tee -a $log
+		 ssh $i "rm -rf ${WORKDIR}/hadoop-${hadoopver}" &>>/dev/null
 		fi
 		
-        echo 'Unzipping Hadoop setup file on '$i'' | tee -a $log	  
-	    ssh $i "tar xf hadoop-${hadoopver}.tar.gz --gzip" 
+         echo 'Unzipping Hadoop setup file on '$i'' | tee -a $log	  
+	     ssh $i "tar xf hadoop-${hadoopver}.tar.gz --gzip" 
 	 
-        echo 'Updating hadoop variables on '$i'' | tee -a $log
+         echo 'Updating hadoop variables on '$i'' | tee -a $log
 		 
-	     export HADOOP_HOME="${WORKDIR}"/hadoop-${hadoopver}
-
 	     export HADOOP_HOME="${WORKDIR}"/hadoop-${hadoopver}
 	     echo "#StartHadoopEnv"> tmp_b
          echo "export CURDIR="${CURDIR}"" >> tmp_b
@@ -321,6 +319,17 @@ else
     exit 1
 fi  
 
+##exporting hadoop variables for current script session on master
+export HADOOP_HOME=${WORKDIR}/hadoop-${hadoopver}
+export HADOOP_PREFIX=$HADOOP_HOME
+export HADOOP_MAPRED_HOME=$HADOOP_HOME
+export HADOOP_COMMON_HOME=$HADOOP_HOME
+export HADOOP_HDFS_HOME=$HADOOP_HOME
+export YARN_HOME=$HADOOP_HOME
+export HADOOP_CONF_DIR=$HADOOP_HOME/etc/hadoop
+export YARN_CONF_DIR=$HADOOP_HOME/etc/hadoop
+export PATH=$HADOOP_HOME/bin:$PATH
+
 ##Spark installation
 
 echo -e "${ul}Downloading and installing Spark...${nul}\n" | tee -a $log
@@ -384,6 +393,10 @@ do
     echo "---------------------------------------------" | tee -a $log			
 done
 rm -rf tmp_b
+
+##Exporting spark variables for current script session on master
+export SPARK_HOME=${WORKDIR}/spark-${sparkver}-bin-hadoop${hadoopver:0:3}
+export PATH=$SPARK_HOME/bin:$PATH
 
 
 ## updating Slave file for Spark folder
