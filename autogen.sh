@@ -3,16 +3,16 @@
 
 # Creating new config
 echo -e '# Default hdfs configuration properties' > config
-echo -e 'HADOOP_TMP_DIR='${HOME}'/hadoop_tmp/app-hadoop' >> config
+echo -e 'HADOOP_TMP_DIR='${HOME}'/hdfs_dir/app-hadoop' >> config 
 echo -e 'REPLICATION_VALUE=3' >> config
-echo -e 'NAMENODE_DIR='${HOME}'/hadoop_tmp/hdfs-meta' >> config
-echo -e 'DATANODE_DIR='${HOME}'/hadoop_tmp/hdfs-data' >> config
+echo -e 'NAMENODE_DIR='${HOME}'/hdfs_dir/hdfs-meta' >> config
+echo -e 'DATANODE_DIR='${HOME}'/hdfs_dir/hdfs-data' >> config
 
 echo -en '# Master Details\n' >> config
 MASTER=`hostname`
 echo -en 'MASTER='$MASTER'\n\n' >> config
 
-echo -en 'Please enter slave hostname detail in format slave1_hostname,slave2_hostname \n'
+echo -en 'Please enter slave hostname details in format slave1_hostname,slave2_hostname \n'
 read SLAVE_HOSTNAME
 
 echo -en '# Using these format to save SLAVE Details: slave1IP,slave1cpu,slave1memory....\n' >> config
@@ -70,17 +70,17 @@ echo -en 'DATANODE_HTTP_ADDRESS=50075\n' >> config
 echo -en 'DATANODE_IPC_ADDRESS=50020\n\n' >> config
 
 echo -en 'MAPREDUCE_JOBHISTORY_ADDRESS=10020\n' >> config
-echo -en 'MAPREDUCE_JOBHISTORY_ADMIN_ADDRESS=10039\n' >> config 
-echo -en 'MAPREDUCE_JOBHISTORY_WEBAPP_ADDRESS=19883\n\n' >> config
+echo -en 'MAPREDUCE_JOBHISTORY_ADMIN_ADDRESS=10033\n' >> config 
+echo -en 'MAPREDUCE_JOBHISTORY_WEBAPP_ADDRESS=19888\n\n' >> config
 
-echo -en 'RESOURCEMANAGER_SCHEDULER_ADDRESS=8034\n' >> config
-echo -en 'RESOURCEMANAGER_RESOURCE_TRACKER_ADDRESS=8039\n' >> config
-echo -en 'RESOURCEMANAGER_ADDRESS=8038\n' >> config
+echo -en 'RESOURCEMANAGER_SCHEDULER_ADDRESS=8030\n' >> config
+echo -en 'RESOURCEMANAGER_RESOURCE_TRACKER_ADDRESS=8031\n' >> config
+echo -en 'RESOURCEMANAGER_ADDRESS=8032\n' >> config
 echo -en 'RESOURCEMANAGER_ADMIN_ADDRESS=8033\n' >> config
-echo -en 'RESOURCEMANAGER_WEBAPP_ADDRESS=8089\n\n' >> config
+echo -en 'RESOURCEMANAGER_WEBAPP_ADDRESS=8088\n\n' >> config
 
-echo -en 'NODEMANAGER_LOCALIZER_ADDRESS=8043\n' >> config
-echo -en 'NODEMANAGER_WEBAPP_ADDRESS=8045\n\n' >> config
+echo -en 'NODEMANAGER_LOCALIZER_ADDRESS=8040\n' >> config
+echo -en 'NODEMANAGER_WEBAPP_ADDRESS=8042\n\n' >> config
 echo -en 'SPARKHISTORY_HTTP_ADDRESS=18080\n\n' >> config
 
 echo -e 'Please check configuration (config file) once before run (setup.sh file).'
