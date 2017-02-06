@@ -79,14 +79,16 @@ then
 	#Check for JAVA_HOME in bashrc of all machines
 	for i in `echo $SERVERS |cut -d "=" -f2 | tr "%" "\n" | cut -d "," -f1`
 	do
-		JAVA=$(ssh $i "grep '^export JAVA_HOME' $HOME/.bashrc | cut -f2 -d "="") 2>/dev/null
+		ssh $i 'grep "^export JAVA_HOME" /home/testuser/.bashrc' &>/dev/null
 		if [[ $? -eq 0 ]]
 		then
+            JAVA=$(ssh $i "grep '^export JAVA_HOME' $HOME/.bashrc | cut -f2 -d "="") 2>/dev/null
 			echo -e 'JAVA_HOME found in bashrc of '$i' and java executable in '$JAVA'' | tee -a $log
 		else
 			echo -e 'JAVA_HOME not found in bashrc of '$i', please set the JAVA_HOME variable then continue to run this script.' | tee -a $log
 			exit 1 
 		fi
+		
 	done
     
     echo "---------------------------------------------" | tee -a $log	
