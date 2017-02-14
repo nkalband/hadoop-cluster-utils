@@ -419,7 +419,7 @@ then
     echo "spark.eventLog.enabled   true" >> $SPARK_HOME/conf/spark-defaults.conf
     echo 'spark.eventLog.dir       '${HOME}'/hdfs_dir/spark-events' >> $SPARK_HOME/conf/spark-defaults.conf 
     echo "spark.eventLog.compress  true" >> $SPARK_HOME/conf/spark-defaults.conf
-    echo 'spark.history.fs.logDirectory   '${HOME}'/hdfs_dir/spark-events-history' >> $SPARK_HOME/conf/spark-defaults.conf
+    echo 'spark.history.fs.logDirectory   '${HOME}'/hdfs_dir/spark-events' >> $SPARK_HOME/conf/spark-defaults.conf
     echo "#StopSparkconf">> $SPARK_HOME/conf/spark-defaults.conf
 else
     sed -i '/#StartSparkconf/,/#StopSparkconf/ d' $SPARK_HOME/conf/spark-defaults.conf
@@ -427,7 +427,7 @@ else
     echo "spark.eventLog.enabled   true" >> $SPARK_HOME/conf/spark-defaults.conf
     echo 'spark.eventLog.dir       '${HOME}'/hdfs_dir/spark-events' >> $SPARK_HOME/conf/spark-defaults.conf
     echo "spark.eventLog.compress  true" >> $SPARK_HOME/conf/spark-defaults.conf
-    echo 'spark.history.fs.logDirectory   '${HOME}'/hdfs_dir/spark-events-history' >> $SPARK_HOME/conf/spark-defaults.conf
+    echo 'spark.history.fs.logDirectory   '${HOME}'/hdfs_dir/spark-events' >> $SPARK_HOME/conf/spark-defaults.conf
     echo "#StopSparkconf">> $SPARK_HOME/conf/spark-defaults.conf
 fi
 
@@ -450,15 +450,13 @@ then
      AN "mkdir -p $NAMENODE_DIR" &>/dev/null
      AN "mkdir -p $DATANODE_DIR" &>/dev/null
      AN "mkdir -p '${HOME}'/hdfs_dir/spark-events" &>/dev/null
-     AN "mkdir -p '${HOME}'/hdfs_dir/spark-events-history" &>/dev/null
-     echo "Finished creating directories"
+    echo "Finished creating directories"
 else 
      AN "rm -rf '${HOME}'/hdfs_dir/*" &>/dev/null
 	 AN "mkdir -p $HADOOP_TMP_DIR" &>/dev/null
      AN "mkdir -p $NAMENODE_DIR" &>/dev/null
      AN "mkdir -p $DATANODE_DIR" &>/dev/null
      AN "mkdir -p '${HOME}'/hdfs_dir/spark-events" &>/dev/null
-     AN "mkdir -p '${HOME}'/hdfs_dir/spark-events-history" &>/dev/null
      echo "Finished creating directories"
 fi        
 
