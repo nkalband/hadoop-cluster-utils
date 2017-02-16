@@ -79,7 +79,7 @@ then
 	#Check for JAVA_HOME in bashrc of all machines
 	for i in `echo $SERVERS |cut -d "=" -f2 | tr "%" "\n" | cut -d "," -f1`
 	do
-		ssh $i 'grep "^export JAVA_HOME" /home/testuser/.bashrc' &>/dev/null
+		ssh $i 'grep "^export JAVA_HOME" $HOME/.bashrc' &>/dev/null
 		if [[ $? -eq 0 ]]
 		then
             JAVA=$(ssh $i "grep '^export JAVA_HOME' $HOME/.bashrc | cut -f2 -d "="") 2>/dev/null
@@ -419,7 +419,7 @@ then
     echo "spark.eventLog.enabled   true" >> $SPARK_HOME/conf/spark-defaults.conf
     echo 'spark.eventLog.dir       '${HOME}'/hdfs_dir/spark-events' >> $SPARK_HOME/conf/spark-defaults.conf 
     echo "spark.eventLog.compress  true" >> $SPARK_HOME/conf/spark-defaults.conf
-    echo 'spark.history.fs.logDirectory   '${HOME}'/hdfs_dir/spark-events-history' >> $SPARK_HOME/conf/spark-defaults.conf
+    echo 'spark.history.fs.logDirectory   '${HOME}'/hdfs_dir/spark-events' >> $SPARK_HOME/conf/spark-defaults.conf
     echo "#StopSparkconf">> $SPARK_HOME/conf/spark-defaults.conf
 else
     sed -i '/#StartSparkconf/,/#StopSparkconf/ d' $SPARK_HOME/conf/spark-defaults.conf
@@ -427,7 +427,7 @@ else
     echo "spark.eventLog.enabled   true" >> $SPARK_HOME/conf/spark-defaults.conf
     echo 'spark.eventLog.dir       '${HOME}'/hdfs_dir/spark-events' >> $SPARK_HOME/conf/spark-defaults.conf
     echo "spark.eventLog.compress  true" >> $SPARK_HOME/conf/spark-defaults.conf
-    echo 'spark.history.fs.logDirectory   '${HOME}'/hdfs_dir/spark-events-history' >> $SPARK_HOME/conf/spark-defaults.conf
+    echo 'spark.history.fs.logDirectory   '${HOME}'/hdfs_dir/spark-events' >> $SPARK_HOME/conf/spark-defaults.conf
     echo "#StopSparkconf">> $SPARK_HOME/conf/spark-defaults.conf
 fi
 
@@ -450,7 +450,6 @@ then
      AN "mkdir -p $NAMENODE_DIR" &>/dev/null
      AN "mkdir -p $DATANODE_DIR" &>/dev/null
      AN "mkdir -p '${HOME}'/hdfs_dir/spark-events" &>/dev/null
-     AN "mkdir -p '${HOME}'/hdfs_dir/spark-events-history" &>/dev/null
      echo "Finished creating directories"
 else 
      AN "rm -rf '${HOME}'/hdfs_dir/*" &>/dev/null
@@ -458,13 +457,12 @@ else
      AN "mkdir -p $NAMENODE_DIR" &>/dev/null
      AN "mkdir -p $DATANODE_DIR" &>/dev/null
      AN "mkdir -p '${HOME}'/hdfs_dir/spark-events" &>/dev/null
-     AN "mkdir -p '${HOME}'/hdfs_dir/spark-events-history" &>/dev/null
      echo "Finished creating directories"
 fi        
 
 echo 'Formatting NAMENODE'| tee -a $log
 
-$HADOOP_PREFIX/bin/hdfs namenode -format mycluster >> $log
+$HADOOP_PREFIX/bin/hdfs namenode -format mycluster >> $log 2>&1
 echo -e | tee -a $log
 $CURDIR/hadoop/start-all.sh | tee -a $log
 echo -e | tee -a $log
@@ -491,19 +489,18 @@ if [[ $prompt == "y" || $prompt == "Y" || $prompt == "yes" || $prompt == "Yes" ]
 then
   ${SPARK_HOME}/bin/spark-submit --class org.apache.spark.examples.SparkPi --master yarn-client --driver-memory 1024M --num-executors 2 --executor-memory 1g  --executor-cores 1 ${SPARK_HOME}/examples/jars/spark-examples_2.11-2.0.1.jar 10 &>> $log
   
+  echo -e | tee -a $log
+  echo "---------------------------------------------" | tee -a $log	
+  grep -r 'Pi is roughly' ${log}
+  if [ $? -eq 0 ];
+  then
+     echo -e 'Spark services running.\n' | tee -a $log
+     echo -e 'Please check log file '$log' for more details.\n'
+  else
+     echo -e 'Expected output not found.\n' | tee -a $log
+     echo -e 'Please check log file '$log' for more details. \n'
+  fi
 else
-  echo "Thanks for your response"
-fi
-
-echo -e | tee -a $log
-echo "---------------------------------------------" | tee -a $log	
-grep -r 'Pi is roughly' ${log}
-if [ $? -eq 0 ];
-then
-   echo -e 'Spark services running.\n' | tee -a $log
-   echo -e 'Please check log file '$log' for more details.\n'
-else
-   echo -e 'Expected output not found.\n' | tee -a $log
-   echo -e 'Please check log file '$log' for more details. \n'
+  echo "Setup Complete !! "
 fi
 echo -e 'Please execute "source ~/.bashrc" to export updated hadoop and spark environment variables in your current login session. \n'
