@@ -295,7 +295,8 @@ then
       sed -i 's|0.0.0.0:RESOURCEMANAGER_RESOURCE_TRACKER_ADDRESS|'"$MASTER"':'"$RESOURCEMANAGER_RESOURCE_TRACKER_ADDRESS"'|g' ${CURDIR}/conf/yarn-site.xml
       sed -i 's|0.0.0.0:RESOURCEMANAGER_ADDRESS|'"$MASTER"':'"$RESOURCEMANAGER_ADDRESS"'|g' ${CURDIR}/conf/yarn-site.xml
       sed -i 's|0.0.0.0:RESOURCEMANAGER_ADMIN_ADDRESS|'"$MASTER"':'"$RESOURCEMANAGER_ADMIN_ADDRESS"'|g' ${CURDIR}/conf/yarn-site.xml
-      sed -i 's|0.0.0.0:RESOURCEMANAGER_WEBAPP_ADDRESS|'"$MASTER"':'"$RESOURCEMANAGER_WEBAPP_ADDRESS"'|g' ${CURDIR}/conf/yarn-site.xml
+      # RESOURCEMANAGER_WEBAPP_ADDRESS should not be associated with a private IP for enabling remote access.
+      sed -i 's|0.0.0.0:RESOURCEMANAGER_WEBAPP_ADDRESS|'"0.0.0.0"':'"$RESOURCEMANAGER_WEBAPP_ADDRESS"'|g' ${CURDIR}/conf/yarn-site.xml
       sed -i 's|NODEMANAGER_LOCALIZER_ADDRESS|'"$NODEMANAGER_LOCALIZER_ADDRESS"'|g' ${CURDIR}/conf/yarn-site.xml
       sed -i 's|NODEMANAGER_WEBAPP_ADDRESS|'"$NODEMANAGER_WEBAPP_ADDRESS"'|g' ${CURDIR}/conf/yarn-site.xml
 		 
@@ -443,30 +444,60 @@ CP $SPARK_HOME/conf/log4j.properties $SPARK_HOME/conf &>/dev/null
 
 ##to start hadoop setup
 
-if [ ! -d "$HADOOP_TMP_DIR" ]
-then
-    # Creating directories
-     AN "mkdir -p $HADOOP_TMP_DIR" &>/dev/null
-     AN "mkdir -p $NAMENODE_DIR" &>/dev/null
-     AN "mkdir -p $DATANODE_DIR" &>/dev/null
-     AN "mkdir -p '${HOME}'/hdfs_dir/spark-events" &>/dev/null
-     echo "Finished creating directories"
-else 
-     AN "rm -rf '${HOME}'/hdfs_dir/*" &>/dev/null
-	 AN "mkdir -p $HADOOP_TMP_DIR" &>/dev/null
-     AN "mkdir -p $NAMENODE_DIR" &>/dev/null
-     AN "mkdir -p $DATANODE_DIR" &>/dev/null
-     AN "mkdir -p '${HOME}'/hdfs_dir/spark-events" &>/dev/null
-     echo "Finished creating directories"
-fi        
+#
+# Check whether the list of directories exist.
+#   even if one directory got missed out, delete & recreate all directories and do hdfs format.
+#   even all directories exist, prompt whether to initiate hdfs format.
+#
+RMDIR=0
+for slave in `echo $SERVERS  |cut -d "=" -f2 | tr "%" "\n" | cut -d "," -f1 `
+do
+for dr in $HADOOP_TMP_DIR $NAMENODE_DIR $DATANODE_DIR
+do
+  splitdir=$(echo $dr | tr "," "\n")
+  for idr in $splitdir
+  do
+    ssh $slave "ls -ld $idr >/dev/null 2>&1"
+    if [ $? -ne 0 ]; then
+      RMDIR=1
+    fi
+  done
+done
+done
 
-echo 'Formatting NAMENODE'| tee -a $log
+if [ $RMDIR == 1 ]; then
+  for slave in `echo $SERVERS  |cut -d "=" -f2 | tr "%" "\n" | cut -d "," -f1 `
+  do
+  for dr in $HADOOP_TMP_DIR $NAMENODE_DIR $DATANODE_DIR
+  do
+    splitdir=$(echo $dr | tr "," "\n")
+    for idr in $splitdir
+    do
+      ssh $slave "ls -ld $idr >/dev/null 2>&1"
+      if [ $? -eq 0 ]; then
+        ssh $slave "rm -rf $idr"
+      fi
+      ssh $slave "mkdir -p $idr"
+    done
+  done
+  done 
+  echo "Finished creating HDFS directories"
+  echo 'Formatting NAMENODE'| tee -a $log
+  $HADOOP_PREFIX/bin/hdfs namenode -format mycluster >> $log 2>&1
+else
+  read -p "** NOTE ** HDFS directories existing. Do you wish to format ? [y/N] " prmpt
+  if [[ $prompt == "y" || $prompt == "Y" || $prompt == "yes" || $prompt == "Yes" ]]; then
+    echo 'Formatting NAMENODE'| tee -a $log
+    $HADOOP_PREFIX/bin/hdfs namenode -format mycluster >> $log 2>&1
+  fi
+fi
 
-$HADOOP_PREFIX/bin/hdfs namenode -format mycluster >> $log 2>&1
+AN "mkdir -p '${HOME}'/hdfs_dir/spark-events" &>/dev/null
+
 echo -e | tee -a $log
 $CURDIR/hadoop/start-all.sh | tee -a $log
-echo -e | tee -a $log
-$CURDIR/utils/checkall.sh | tee -a $log
+# echo -e | tee -a $log
+# $CURDIR/utils/checkall.sh | tee -a $log
 
 ## use stop-all.sh for stopping
 
@@ -500,7 +531,8 @@ then
      echo -e 'Expected output not found.\n' | tee -a $log
      echo -e 'Please check log file '$log' for more details. \n'
   fi
-else
-  echo "Setup Complete !! "
 fi
+
+echo "Setup Complete !! "
 echo -e 'Please execute "source ~/.bashrc" to export updated hadoop and spark environment variables in your current login session. \n'
+
