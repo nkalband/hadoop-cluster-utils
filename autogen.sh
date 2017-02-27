@@ -83,6 +83,18 @@ echo -en 'NODEMANAGER_LOCALIZER_ADDRESS=8040\n' >> config
 echo -en 'NODEMANAGER_WEBAPP_ADDRESS=8042\n\n' >> config
 echo -en 'SPARKHISTORY_HTTP_ADDRESS=18080\n\n' >> config
 
+##setting flag to setup hive and mysql or not
+echo -e "#Flag set for hive and mysql set up required or not" >> config
+echo -e 'Do you want to setup hive and mysql. This will be required for running benchmarks like TPCDS and HiBench'
+read -p "Please confirm ? [y/N] " prompt
+if [[ $prompt == "y" || $prompt == "Y" ]]
+then
+    echo -e 'SETUP_HIVE_MYSQL=Yes' >> config
+else 
+    echo -e 'SETUP_HIVE_MYSQL=No' >> config
+fi
+
+echo -e
 echo -e 'Please check configuration (config file) once before run (setup.sh file).'
 echo -e 'You can modify hadoop or spark versions in config file'
 echo -e
