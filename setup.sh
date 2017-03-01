@@ -582,8 +582,16 @@ echo "---------------------------------------------" | tee -a $log
 			fi
 		else
 			# RedHat
-			rpm -qa |grep maria >/dev/null 2>&1
+			mdb=0
+			for i in mariadb mariadb-server mariadb-libs
+			do
+			rpm -qa |grep $i >/dev/null 2>&1
 			if [ $? -ne 0 ]; then
+			mdb=1
+			fi
+			done
+			
+			if [ $mdb -ne 0 ]; then
 				sudo yum -y install mariadb mariadb-server mariadb-libs >/dev/null 2>&1
 				sudo systemctl start mariadb.service
 				sudo systemctl enable mariadb.service
@@ -695,8 +703,6 @@ echo "---------------------------------------------" | tee -a $log
 			fi
 			echo "Added mysql-connector-java.jar to spark driver classpath" | tee -a $log
 		fi
-	cp ${SPARK_HOME}/conf/spark-env.sh.template ${SPARK_HOME}/conf/spark-env.sh
-	echo 'SPARK_CLASSPATH=/usr/share/java/mysql-connector-java.jar' >>${SPARK_HOME}/conf/spark-env.sh		
 		
 	fi
     echo "---------------------------------------------" | tee -a $log
