@@ -21,20 +21,48 @@ log=`pwd`/logs/hadoop_cluster_utils_$current_time.log
 echo -e | tee -a $log
 
 
-##Checking if wget and curl installed or not, and getting installed if not
+##Checking if wget and curl installed or not, and getting installed if not for ubuntu and redhat both
+python -mplatform  |grep -i redhat >/dev/null 2>&1
+# Ubuntu
+if [ $? -ne 0 ]
+then
+	dpkg -l | grep -w wget >/dev/null 2>&1
 
-if [ ! -x /usr/bin/wget ] ; then
-   echo "wget is not installed on Master, so getting installed" | tee -a $log
-   sudo apt-get install wget | tee -a $log
+	if [ $? -ne 0 ]
+	then
+		echo "wget is not installed on Master, so getting installed" | tee -a $log
+		sudo apt-get install wget | tee -a $log
+	else
+		echo "wget is already installed on Master" | tee -a $log
+	fi
+	
+	dpkg -l | grep -w curl >/dev/null 2>&1
+	if [ $? -ne 0 ]
+	then
+		echo "curl is not installed on Master, so getting installed" | tee -a $log
+		sudo apt-get install curl | tee -a $log
+	else
+		echo "curl is already installed on Master" | tee -a $log
+	fi
 else
-   echo "wget is already installed on Master" | tee -a $log
-fi
+   	rpm -qa |grep -w wget >/dev/null 2>&1
 
-if [ ! -x /usr/bin/curl ] ; then
-   echo "curl is not installed on Master, so getting installed" | tee -a $log
-   sudo apt-get install curl | tee -a $log
-else
-   echo "curl is already installed on Master" | tee -a $log
+	if [ $? -ne 0 ]
+	then
+		echo "wget is not installed on Master, so getting installed" | tee -a $log
+		sudo yum install wget | tee -a $log
+	else
+		echo "wget is already installed on Master" | tee -a $log
+	fi
+	
+	rpm -qa |grep -w curl >/dev/null 2>&1
+	if [ $? -ne 0 ]
+	then
+		echo "curl is not installed on Master, so getting installed" | tee -a $log
+		sudo yum install curl | tee -a $log
+	else
+		echo "curl is already installed on Master" | tee -a $log
+	fi
 fi
 
 echo "---------------------------------------------" | tee -a $log	
@@ -60,7 +88,7 @@ then
           fi
       fi
     done
-	
+				
 	#Logic to create server list 
     cat ${CURDIR}/config | grep SLAVES | grep -v "^#" | tr "%" "\n" | grep "$MASTER" &>>/dev/null
     if [ $? -eq 0 ]
@@ -475,13 +503,13 @@ if [ $RMDIR == 1 ]; then
     do
       ssh $slave "ls -ld $idr >/dev/null 2>&1"
       if [ $? -eq 0 ]; then
-        ssh $slave "rm -rf $idr"
+        ssh $slave "rm -rf $idr" 
       fi
       ssh $slave "mkdir -p $idr"
     done
   done
   done 
-  echo "Finished creating HDFS directories"
+  echo "Finished creating HDFS directories" | tee -a $log
   echo 'Formatting NAMENODE'| tee -a $log
   $HADOOP_PREFIX/bin/hdfs namenode -format mycluster >> $log 2>&1
 else
@@ -500,7 +528,186 @@ $CURDIR/hadoop/start-all.sh | tee -a $log
 # $CURDIR/utils/checkall.sh | tee -a $log
 
 ## use stop-all.sh for stopping
+source ${HOME}/.bashrc
 
+echo "---------------------------------------------" | tee -a $log
+
+##Installing hive and mysql
+	
+	if [ ${SETUP_HIVE_MYSQL} == "Yes" ]
+	then 
+		echo "Setting up mysql" | tee -a $log
+
+		python -mplatform  |grep -i redhat >/dev/null 2>&1
+		# Ubuntu
+		if [ $? -ne 0 ]
+		then
+			dpkg -l | grep mysql >/dev/null 2>&1
+
+			if [ $? -ne 0 ]
+			then
+				sudo apt-key update
+				sudo apt-get -y update
+				sudo apt-get -y dist-upgrade
+
+				dpkg -S /usr/bin/mysq
+				if [ $? -ne 0 ]
+				then
+					sudo debconf-set-selections <<< 'mysql-server mysql-server/root_password password passw0rd'
+					sudo debconf-set-selections <<< 'mysql-server mysql-server/root_password_again password passw0rd'
+					sudo apt-get -y install mysql-server --force-yes
+					sudo apt-get -y install mysql-client --force-yes
+				fi
+			else
+				echo "mysql is already installed" | tee -a $log
+			fi
+
+			if [ ! -f /usr/share/java/mysql-connector-java.jar ]
+			then
+				sudo apt-get -y install libmysql-java --force-yes
+			else
+				echo "mysql connector is installed already" | tee -a $log
+			fi
+
+			sudo netstat -tap | grep mysql >/dev/null 2>&1
+			if [ $? -ne 0 ]
+			then
+				sudo systemctl restart mysql.service
+				sudo netstat -tap | grep mysql
+				if [ $? -ne 0 ]
+				then
+					echo "Failed to start mysql" | tee -a $log
+					exit 255
+				fi
+			fi
+		else
+			# RedHat
+			mdb=0
+			for i in mariadb mariadb-server mariadb-libs
+			do
+			rpm -qa |grep $i >/dev/null 2>&1
+			if [ $? -ne 0 ]; then
+			mdb=1
+			fi
+			done
+			
+			if [ $mdb -ne 0 ]; then
+				sudo yum -y install mariadb mariadb-server mariadb-libs >/dev/null 2>&1
+				sudo systemctl start mariadb.service
+				sudo systemctl enable mariadb.service
+
+				rpm -qa | grep expect >/dev/null 2>&1
+				if [ $? -ne 0 ] ; then
+				  sudo yum -y install expect >/dev/null 2>&1
+				fi
+
+				MYSQL=passw0rd
+
+				echo "Setting mysql root password to ${MYSQL}" | tee -a $log
+				SECURE_MYSQL=$(expect -c "
+				set timeout 10
+				spawn mysql_secure_installation
+				expect \"Enter current password for root (enter for none):\"
+				send \"\r\"
+				expect \"Set root password?\"
+				send \"y\r\"
+				expect \"New password:\"
+				send \"$MYSQL\r\"
+				expect \"Re-enter new password:\"
+				send \"$MYSQL\r\"
+				expect \"Remove anonymous users?\"
+				send \"y\r\"
+				expect \"Disallow root login remotely?\"
+				send \"y\r\"
+				expect \"Remove test database and access to it?\"
+				send \"y\r\"
+				expect \"Reload privilege tables now?\"
+				send \"y\r\"
+				expect eof
+				")
+
+				
+			else
+				echo "mysql is already installed" | tee -a $log
+			fi
+
+			if [ ! -f /usr/share/java/mysql-connector-java.jar ]
+			then
+				sudo sudo yum -y install mysql-connector-java
+			else
+				echo "mysql connector is installed already" | tee -a $log
+			fi
+		fi
+
+		# Check for hive user
+		mysql -u root -ppassw0rd -e 'select user from mysql.user where user="hive" and host="localhost";' 2>&1 | grep -w hive >/dev/null
+		if [ $? -ne 0 ]
+		then
+			mysql -u root -ppassw0rd -e "CREATE USER 'hive'@'%' IDENTIFIED BY 'hivepassword';GRANT all on *.* to 'hive'@localhost identified by 'hivepassword';flush privileges;"
+			if [ $? -ne 0 ]
+			then
+				echo "Failed to create hive user" | tee -a $log
+				exit 255
+			fi
+			echo "User hive added to mysql" | tee -a $log
+		else
+			mysql -u hive -phivepassword -e "show databases;" >/dev/null 2>&1
+			if [ $? -ne 0 ]
+			then
+				echo "Note: Error accessing hive user with the password: hivepassword;"
+				echo "      Ensure that the ConnectionUserName/ConnectionPassword in hive-site.xml"
+				echo "      in Spark conf directory matches with the mysql's hive user"
+			fi
+			echo "Existing user hive in mysql is sufficient." | tee -a $log
+		fi
+
+#Copying hive-site.xml into ${SPARK_HOME}/conf/
+
+		if [ ! -f ${SPARK_HOME}/conf/hive-site.xml ]
+		then
+			cp ${CURDIR}/conf/hive-site.xml.template ${SPARK_HOME}/conf/hive-site.xml
+			if [ $? -eq 0 ]
+			then
+			   echo "Sucessfully placed ${SPARK_HOME}/conf/hive-site.xml" | tee -a $log
+			fi
+		else
+			echo "${SPARK_HOME}/conf/hive-site.xml exist already."
+			echo "Note: Check it out javax.jdo.option.ConnectionUserName"
+			echo "      and javax.jdo.option.ConnectionPassword attributes"
+			echo "      it should match with the mysql's hive user"
+		fi
+
+		echo "Adding mysql connector to Spark Classpath" | tee -a $log
+		grep spark.executor.extraClassPath ${SPARK_HOME}/conf/spark-defaults.conf | grep -v "^#" | grep mysql-connector-java.jar >/dev/null 2>&1
+		if [ $? -ne 0 ]; then
+			grep spark.executor.extraClassPath ${SPARK_HOME}/conf/spark-defaults.conf | grep -v "^#" >/dev/null 2>&1
+			if [ $? -ne 0 ]; then
+			# Fresh entry
+				echo "spark.executor.extraClassPath /usr/share/java/mysql-connector-java.jar" >> ${SPARK_HOME}/conf/spark-defaults.conf
+			else
+			# append to the existing CLASSPATH
+				sed -i '/^spark.executor.extraClassPath/ s~$~:/usr/share/java/mysql-connector-java.jar~' ${SPARK_HOME}/conf/spark-defaults.conf
+			fi
+			echo "Added mysql-connector-java.jar to spark executor classpath" | tee -a $log
+		fi
+
+		grep spark.driver.extraClassPath ${SPARK_HOME}/conf/spark-defaults.conf | grep -v "^#" | grep mysql-connector-java.jar >/dev/null 2>&1
+		if [ $? -ne 0 ]; then
+			grep spark.driver.extraClassPath ${SPARK_HOME}/conf/spark-defaults.conf | grep -v "^#" >/dev/null 2>&1
+			if [ $? -ne 0 ]; then
+			# Fresh entry
+				echo "spark.driver.extraClassPath /usr/share/java/mysql-connector-java.jar" >> ${SPARK_HOME}/conf/spark-defaults.conf
+			else
+			# append to the existing CLASSPATH
+				sed -i '/^spark.driver.extraClassPath/ s~$~:/usr/share/java/mysql-connector-java.jar~' ${SPARK_HOME}/conf/spark-defaults.conf
+			fi
+			echo "Added mysql-connector-java.jar to spark driver classpath" | tee -a $log
+		fi
+		
+	fi
+    echo "---------------------------------------------" | tee -a $log
+
+	
 echo -e | tee -a $log
 echo "${ul}Web URL link${nul}" | tee -a $log
 echo "HDFS web address : http://"$MASTER":"$NAMENODE_HTTP_ADDRESS"" | tee -a $log 
@@ -512,7 +719,7 @@ echo "---------------------------------------------" | tee -a $log
 echo "${ul}Ensure SPARK running correctly using following command${nul}" | tee -a $log
 echo "${SPARK_HOME}/bin/spark-submit --class org.apache.spark.examples.SparkPi --master yarn-client --driver-memory 1024M --num-executors 2 --executor-memory 1g  --executor-cores 1 ${SPARK_HOME}/examples/jars/spark-examples_2.11-2.0.1.jar 10" | tee -a $log
 echo -e 
-source ${HOME}/.bashrc
+
 read -p "Do you wish to run above command ? [y/N] " prompt
 
 

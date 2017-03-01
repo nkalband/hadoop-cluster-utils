@@ -25,7 +25,8 @@ ssh user@host
 ### Pre-requisities:
 1. JAVA Setup should be completed and JAVA_HOME should be set in the ~/.bashrc file (environment variable).
 2. Make sure the nodes are set for password-less SSH both ways(master->slaves).
-3. Since we use the environment variables a lot in our scripts, make sure to comment/delete out the portion following this statement in your ~/.bashrc , `If not running interactively, don't do anything`. 
+3. Since we use the environment variables a lot in our scripts, make sure to comment out the portion following this statement in your ~/.bashrc , 
+`If not running interactively, don't do anything`. Update .bashrc
 
  Delete/comment the following check.
   ```
@@ -35,7 +36,7 @@ ssh user@host
          *) return;;
    esac
   ```
-4. Same username/useraccount should be needed on `master` and `slaves` nodes for multinode installation.
+4. Same username/useraccount should be need on `master` and `slaves` nodes for multinode installation.
 
 ### Installations:
 
@@ -52,9 +53,10 @@ ssh user@host
    1. To configure `hadoop-cluster-utils`, run `./autogen.sh` which will create `config` with appropriate field values.
    2. User can enter SLAVE hostnames (if more than one, use comma seperated) interactively while running `./autogen.sh` file.
    3. Default `Spark-2.0.1` and `Hadoop-2.7.1` version available for installation. 
-   4. User can edit default port values, `spark` and `hadoop` versions in config file.
-   5. Before executing `./setup.sh` file, user can verify or edit `config` 
-   6. Once setup script completed,source `~/.bashrc` file to export updated hadoop and spark environment variables for current login session. 
+   4. While running `./autogen.sh` file, it will prompt for your choice for setting up Hive and Mysql on your master, select desired option.Hive and Mysql setup is required for running spark benchmarks like TPCDS,HiBench. 
+   5. User can edit default port values, `spark` and `hadoop` versions in config
+   6. Before executing `./setup.sh` file, user can verify or edit `config` 
+   7. Once setup script completed,source `~/.bashrc` file to export updated hadoop and spark environment variables for current login session. 
    
 * Ensure that the following java process is running in master. If not, check the log files
   
