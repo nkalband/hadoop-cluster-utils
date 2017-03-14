@@ -464,10 +464,13 @@ CP $SPARK_HOME/conf/spark-defaults.conf $SPARK_HOME/conf &>/dev/null
 
 echo -e "Spark installation done..!!\n" | tee -a $log
 
-#setting spark log properties to display only errors
+#setting spark and hadoop log properties to display only errors
 cp $SPARK_HOME/conf/log4j.properties.template $SPARK_HOME/conf/log4j.properties
 sed -i 's/^log4j.rootCategory.*/log4j.rootCategory=ERROR, console/g' $SPARK_HOME/conf/log4j.properties
 CP $SPARK_HOME/conf/log4j.properties $SPARK_HOME/conf &>/dev/null
+
+sed -i 's/log4j.threshold=ALL/log4j.threshold=ERROR/g' ${HADOOP_HOME}/etc/hadoop/log4j.properties
+CP ${HADOOP_HOME}/etc/hadoop/log4j.properties ${HADOOP_HOME}/etc/hadoop &>/dev/null
 
 
 ##to start hadoop setup
