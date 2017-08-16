@@ -41,8 +41,8 @@ echo -en '#Node Manager properties (Default yarn cpu and memory value for all no
 echo -en 'YARN_SCHEDULER_MIN_ALLOCATION_MB=128\n' >> config				 
 echo -en 'YARN_SCHEDULER_MIN_ALLOCATION_VCORES=1\n\n' >> config
 echo -e
-echo -en 'Default Spark version : 2.0.1\n'
-sparkver="2.0.1"
+echo -en 'Default Spark version : 2.0.2\n'
+sparkver="2.0.2"
 echo -en 'Default hadoop version : 2.7.1\n'	
 hadoopver="2.7.1"
 
